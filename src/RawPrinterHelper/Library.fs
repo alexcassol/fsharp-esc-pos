@@ -44,8 +44,7 @@ module Printer =
 
         let retVal = sendToPrinter szPrinterName pUnmanagedBytes len
         
-        if len <> 0 then
-            Marshal.FreeCoTaskMem(pUnmanagedBytes)        
+        Marshal.FreeCoTaskMem(pUnmanagedBytes)        
         retVal
 
     let SendStringToPrinter (szPrinterName: string, szString: string) =
@@ -79,8 +78,7 @@ module Printer =
         Marshal.Copy(data, 0, pUnmanagedBytes, len)   
         let retVal = sendToPrinter szPrinterName pUnmanagedBytes len
 
-        if len <> 0 then
-            Marshal.FreeCoTaskMem(pUnmanagedBytes) 
+        Marshal.FreeCoTaskMem(pUnmanagedBytes) 
         retVal
          
 
