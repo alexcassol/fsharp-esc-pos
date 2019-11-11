@@ -9,42 +9,32 @@ module Printer =
     let randomStr = 
         let chars = "ABCDEFGHIJKLMNOPQRSTUVWUXYZ0123456789"
         let charsLen = chars.Length
-        let random = System.Random()
-
+        let random = Random()
         fun len -> 
             let randomChars = [|for i in 0..len -> chars.[random.Next(charsLen)]|]
-            System.String(randomChars)
+            String(randomChars)
+
+    let getError =
+        Marshal.GetLastWin32Error()  
 
     let private sendToPrinter szPrinterName pBytes dwCount =
-        let mutable dwError = 0
         let mutable dwWritten = 0
         let mutable hPrinter = new nativeint(0)
-        let mutable di = DOCINFOA(pDocName = randomStr(8), pDataType = "RAW", pOutputFile = null)
+        let mutable di = DOCINFOA(pDocName = randomStr 8, pDataType = "RAW", pOutputFile = null)
         let mutable bSuccess = false
 
-        match OpenPrinter(szPrinterName, hPrinter, IntPtr.Zero) with
-        | true ->   
-            match StartDocPrinter(hPrinter, 1, di) with
-            | true ->
-                let _ = 
-                    match StartPagePrinter(hPrinter) with
-                    | true -> 
-                        bSuccess <- WritePrinter(hPrinter, pBytes, dwCount, dwWritten)
-                        EndPagePrinter(hPrinter)
-                    | _ -> false
-                
-                EndDocPrinter(hPrinter)
-                |> ignore
+        if OpenPrinter(szPrinterName, hPrinter, IntPtr.Zero) then
+            if StartDocPrinter(hPrinter, 1, di) then
+                if StartPagePrinter(hPrinter) then
+                    if WritePrinter(hPrinter, pBytes, dwCount, dwWritten) then
+                        bSuccess <- true
+                    EndPagePrinter(hPrinter) |> ignore                        
+                EndDocPrinter(hPrinter) |> ignore 
+            ClosePrinter(hPrinter) |> ignore 
 
-            | _ -> ()
-
-            ClosePrinter(hPrinter)
-            |> ignore
-        | _ -> ()
-
-        if bSuccess then
-            dwError <- Marshal.GetLastWin32Error()        
-        bSuccess
+        match bSuccess with
+        | true -> 0
+        | _ ->  getError
  
     
     let SendBytesToPrinter (szPrinterName: string, data: byte[]) =
@@ -54,7 +44,7 @@ module Printer =
 
         let retVal = sendToPrinter szPrinterName pUnmanagedBytes len
         
-        if len > 0 then
+        if len <> 0 then
             Marshal.FreeCoTaskMem(pUnmanagedBytes)        
         retVal
 
@@ -70,11 +60,10 @@ module Printer =
         let retVal = sendToPrinter szPrinterName pBytes dwCount
         retVal
     
-    let SendAsciiToPrinter (szPrinterName: string, data: string) =
-        let enc = System.Text.Encoding.ASCII.GetBytes data
+    let SendAsciiToPrinter (szPrinterName: string, szString: string) =
+        let enc = System.Text.Encoding.ASCII.GetBytes szString
         //if  you are using UTF-8 and get wrong values in qrcode printing, you must use ASCII instead.
-        //let enc = System.Text.Encoding.UTF8.GetBytes(data)
-        
+        //let enc = System.Text.Encoding.UTF8.GetBytes(data)        
         let retVal = SendBytesToPrinter(szPrinterName, enc)
         retVal
 
@@ -90,7 +79,7 @@ module Printer =
         Marshal.Copy(data, 0, pUnmanagedBytes, len)   
         let retVal = sendToPrinter szPrinterName pUnmanagedBytes len
 
-        if len > 0 then
+        if len <> 0 then
             Marshal.FreeCoTaskMem(pUnmanagedBytes) 
         retVal
          
