@@ -6,6 +6,8 @@
 
   <ItemGroup>
     <Compile Include="SysOp.fs" />
+    <Compile Include="Lists.fs" />
+    <Compile Include="Conversions.fs" />
   </ItemGroup>
 
 </Project>

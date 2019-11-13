@@ -19,17 +19,18 @@
 //DEALINGS IN THE SOFTWARE.
 
 namespace CommonLibrary
+ 
+open System
 
 module SysOp =
-    open System
 
     type OS =
-            | OSX            
-            | Windows
-            | Linux
+        | OSX            
+        | Windows
+        | Linux
 
     let getOS = 
-            match int Environment.OSVersion.Platform with
-            | 4 | 128 -> Linux
-            | 6       -> OSX
-            | _       -> Windows
+        match int Environment.OSVersion.Platform with
+        | 4 | 128 -> Linux
+        | 6       -> OSX
+        | _       -> Windows
