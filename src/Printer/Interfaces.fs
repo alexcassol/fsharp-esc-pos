@@ -2,7 +2,7 @@ namespace Printer
 
 module Interfaces =
     type OnOff = | On | Off
-    type CutType = | Partial | Total
+    type CutType = | Partial | Full
 
     type IFontMode =
         abstract member Italic  : OnOff -> byte array
@@ -29,6 +29,8 @@ module Interfaces =
         inherit IFontMode
         inherit IAlignment
 
+        abstract member InitializePrinter: unit -> byte array
+
         abstract member FontA: OnOff -> byte array
         abstract member FontAText: string -> byte array
         abstract member FontB: OnOff -> byte array
@@ -36,7 +38,9 @@ module Interfaces =
 
         abstract member OpenCashDrawer: unit -> byte array
         abstract member PaperCut: CutType -> byte array
+        abstract member AutoTest: unit -> byte array
 
     type ICommandEPL =
         inherit IFontMode
         inherit IAlignment
+ 

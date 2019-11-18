@@ -2,7 +2,17 @@ namespace Printer
 open Interfaces
 open CommonLibrary.Conversions
 
-type PrinterEscPos() = 
+
+type DocumentDefinition = { 
+    ColsNormal: int
+    ColsCondensed: int
+    ColsExpanded: int 
+    }    
+
+type PrinterEscPos(docDef:DocumentDefinition) = 
+
+    member this.DocLanguage =
+        this :> ICommandEscPos
  
     interface ICommandEscPos with
         
@@ -127,4 +137,10 @@ type PrinterEscPos() =
         member this.PaperCut(arg1:CutType) : byte array =
             match arg1 with
             | Partial -> ToByteArray [|29; 86; 65; 3|] 
-            | Total -> ToByteArray [|29; 86; 65; 3|] 
+            | Full -> ToByteArray [|29; 86; 65; 3|] 
+
+        member this.AutoTest() : byte array =
+            ToByteArray [|29; 40; 65; 2; 0; 0; 2|] 
+
+        member this.InitializePrinter() : byte array =
+            ToByteArray [|27; 64|] 

@@ -8,24 +8,25 @@ open Printer.Interfaces
 let main argv =
     printfn "Printing..."
  
-    let docDef = { ColsNormal=42; ColsCondensed=32; ColsExpanded=12 }
+    let docDef = { ColsNormal=42; ColsCondensed=56; ColsExpanded=24 }
  
-    let cmd = (PrinterEscPos() :> ICommandEscPos) 
+    //let prn = (PrinterEscPos(docDef) :> ICommandEscPos) 
+    let prn = PrinterEscPos(docDef).DocLanguage
      
-    let doc = Printer.Document(docDef)
+    let doc = Document(prn)
     doc.Append "teste"
     doc.Append "teste2" 
      
-    doc.Append (cmd.ItalicText "teste")
-    doc.Append (cmd.Italic On)
+    doc.Append (prn.ItalicText "teste")
+    doc.Append (prn.Italic On)
     doc.Append "teste3"
-    doc.Append (cmd.Italic Off)
+    doc.Append (prn.Italic Off)
 
-    doc.Append cmd.Center
+    doc.Append prn.Center
     doc.Append "texto centralizado"
-    doc.Append cmd.Left
+    doc.Append prn.Left
 
-    doc.Append (cmd.PaperCut Partial)
+    doc.Append (prn.PaperCut Partial)
  
     let p = Printer.Printer("PDF")
     
