@@ -25,14 +25,7 @@ module Printer =
     open System.IO
     open System.Runtime.InteropServices
     open Native
-
-    let randomStr = 
-        let chars = "ABCDEFGHIJKLMNOPQRSTUVWUXYZ0123456789"
-        let charsLen = chars.Length
-        let random = Random()
-        fun len -> 
-            let randomChars = [|for i in 0..len -> chars.[random.Next(charsLen)]|]
-            String(randomChars)
+    open CommonLibrary.Utils
 
     let getError =
         Marshal.GetLastWin32Error()  

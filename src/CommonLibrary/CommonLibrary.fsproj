@@ -8,6 +8,7 @@
     <Compile Include="SysOp.fs" />
     <Compile Include="Lists.fs" />
     <Compile Include="Conversions.fs" />
+    <Compile Include="Utils.fs" />
   </ItemGroup>
 
 </Project>

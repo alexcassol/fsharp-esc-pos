@@ -11,9 +11,8 @@ type DocumentDefinition = {
 
 type PrinterEscPos(docDef:DocumentDefinition) = 
 
-    member this.DocLanguage =
-        this :> ICommandEscPos
- 
+    member this.Commands = (this :> ICommandEscPos)        
+
     interface ICommandEscPos with
         
         member this.Bold(arg1: OnOff): byte array = 
@@ -64,7 +63,7 @@ type PrinterEscPos(docDef:DocumentDefinition) =
                 (this :> ICommandEscPos).Underline(Off);
                 ToByte("\n")]
 
-        member this.OpenCashDrawer(): byte array = 
+        member this.OpenCashDrawer: byte array = 
             ToByteArray [|27; 112; 0; 60; 120|]  
 
         member this.Italic(arg1:OnOff): byte array = 
@@ -125,13 +124,13 @@ type PrinterEscPos(docDef:DocumentDefinition) =
                 (this :> ICommandEscPos).FontB(Off);
                 ToByte("\n")]
 
-        member this.Left(): byte array = 
+        member this.Left: byte array = 
             ToByteArray [|27; 97; 0|] 
 
-        member this.Center(): byte array = 
+        member this.Center: byte array = 
             ToByteArray [|27; 97; 1|] 
 
-        member this.Right(): byte array = 
+        member this.Right: byte array = 
             ToByteArray [|27; 97; 2|] 
 
         member this.PaperCut(arg1:CutType) : byte array =
@@ -139,8 +138,8 @@ type PrinterEscPos(docDef:DocumentDefinition) =
             | Partial -> ToByteArray [|29; 86; 65; 3|] 
             | Full -> ToByteArray [|29; 86; 65; 3|] 
 
-        member this.AutoTest() : byte array =
+        member this.AutoTest: byte array =
             ToByteArray [|29; 40; 65; 2; 0; 0; 2|] 
 
-        member this.InitializePrinter() : byte array =
+        member this.InitializePrinter: byte array =
             ToByteArray [|27; 64|] 

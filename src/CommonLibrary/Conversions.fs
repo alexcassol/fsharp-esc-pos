@@ -1,12 +1,7 @@
-namespace CommonLibrary
-open Microsoft.FSharp.Reflection
-open System
+namespace CommonLibrary  
 
 module Conversions =
-    (*
-    let bytesToHex : byte array -> string =
-        fun bytes -> bytes |> Array.fold (fun a x -> a + (byteToHex x)) ""
-        *)
+    open System
 
     let ToByteArray arr = 
         seq { for x in [0..(Array.length arr) - 1] do yield  byte arr.[x] }
@@ -20,7 +15,6 @@ module Conversions =
         | :? 'a as output -> Some output
         | _ -> None
   
-
     let TupleToByteArray tup =
         tup
         |> List.map ( fun m -> Byte.Parse(m))

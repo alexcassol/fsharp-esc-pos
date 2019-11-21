@@ -21,24 +21,24 @@ module Interfaces =
         abstract member InvertText: string -> byte array
     
     type IAlignment =
-        abstract member Left : unit -> byte array
-        abstract member Right : unit -> byte array
-        abstract member Center : unit -> byte array
+        abstract member Left : byte array with get
+        abstract member Right : byte array with get
+        abstract member Center : byte array with get
 
     type ICommandEscPos =
         inherit IFontMode
         inherit IAlignment
 
-        abstract member InitializePrinter: unit -> byte array
+        abstract member InitializePrinter: byte array with get
 
         abstract member FontA: OnOff -> byte array
         abstract member FontAText: string -> byte array
         abstract member FontB: OnOff -> byte array
         abstract member FontBText: string -> byte array
 
-        abstract member OpenCashDrawer: unit -> byte array
+        abstract member OpenCashDrawer: byte array with get
         abstract member PaperCut: CutType -> byte array
-        abstract member AutoTest: unit -> byte array
+        abstract member AutoTest: byte array with get
 
     type ICommandEPL =
         inherit IFontMode

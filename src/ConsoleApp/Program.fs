@@ -1,7 +1,5 @@
 ﻿open System
-open RawPrinterHelper.Printer 
 open Printer
-open CommonLibrary.Conversions
 open Printer.Interfaces
  
 [<EntryPoint>]
@@ -11,11 +9,11 @@ let main argv =
     let docDef = { ColsNormal=42; ColsCondensed=56; ColsExpanded=24 }
  
     //let prn = (PrinterEscPos(docDef) :> ICommandEscPos) 
-    let prn = PrinterEscPos(docDef).DocLanguage
+    let prn = PrinterEscPos(docDef).Commands
      
     let doc = Document(prn)
     doc.Append "teste"
-    doc.Append "teste2" 
+    doc.Append "taste2" 
      
     doc.Append (prn.ItalicText "teste")
     doc.Append (prn.Italic On)
@@ -26,23 +24,9 @@ let main argv =
     doc.Append "texto centralizado"
     doc.Append prn.Left
 
-    doc.Append (prn.PaperCut Partial)
+    doc.Append (prn.PaperCut Full)
  
     let p = Printer.Printer("PDF")
     
     p.Print doc
-   // p.Print doc2
-
-    
-    
-
-    //SendStringToPrinter("PDF", "teste de impressao") |> ignore
-
-    //gameLoop
-    //|> ignore
-
-    //let proc = 
-    //    for x in argv do
-    //        SendStringToPrinter("PDF", x) |> ignore
-
     1

@@ -59,3 +59,13 @@ module Lists =
         member x.Count with get () = queue.Count
 
         member x.Clear () = queue.Clear
+
+        member x.GetAll () =            
+            seq {
+                while queue.Count>0 do
+                    let item = x.TryDequeue()
+                    if item.IsSome then
+                        yield item.Value 
+            }
+            
+            

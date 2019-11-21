@@ -3,15 +3,15 @@
 open CommonLibrary.Lists
 open CommonLibrary.Conversions 
 
-type Document(?printerLanguage) =  
+type Document(?commands) =  
     
     let doc = 
         let tmp = SimpleQueue<byte array>()
  
         try 
-            if printerLanguage.IsSome then
-                match box printerLanguage.Value with
-                | :? Interfaces.ICommandEscPos as x -> tmp.Enqueue (x.InitializePrinter())
+            if commands.IsSome then
+                match box commands.Value with
+                | :? Interfaces.ICommandEscPos as x -> tmp.Enqueue x.InitializePrinter
                 | _ -> ()
         with
         | _ -> () 
@@ -30,8 +30,9 @@ type Document(?printerLanguage) =
  
     member this.Append o = 
         match box o with
-        | :? string as output -> appendString (output, "\n")
-        | _ -> appendBytes (TryCast<byte array>(o)).Value 
+        | :? System.String as o -> appendString (o, "\n")
+        | :? System.Array as o -> appendBytes (TryCast<byte array>(o)).Value 
+        | _ -> ()
 
     member this.NewLine() = 
         this.NewLines 1

@@ -9,11 +9,11 @@ type PrinterEPL() =
         member this.InvertText(arg1: string): byte array = 
             failwith "Not Implemented"
 
-        member this.Center(): byte array = 
+        member this.Center: byte array = 
             failwith "Not Implemented"
-        member this.Left(): byte array = 
+        member this.Left: byte array = 
             failwith "Not Implemented"
-        member this.Right(): byte array = 
+        member this.Right: byte array = 
             failwith "Not Implemented"
 
         member this.Bold(arg1: OnOff): byte array = 
