@@ -5,41 +5,41 @@ open CommonLibrary.Conversions
 
 type Document(?commands) =  
     
-    let doc = 
-        let tmp = SimpleQueue<byte array>()
- 
+    let doc = SimpleQueue<byte array>()
+    
+    do  
         try 
             if commands.IsSome then
                 match box commands.Value with
-                | :? Interfaces.ICommandEscPos as x -> tmp.Enqueue x.InitializePrinter
+                | :? Interfaces.ICommandEscPos as x -> doc.Enqueue x.InitializePrinter
                 | _ -> ()
         with
-        | _ -> () 
-        tmp
+        | _ -> failwith "Unknown command" 
     
     let appendBytes b = 
         doc.Enqueue b    
      
-    let appendString (s:string, newLine:string) =         
+    let appendString s =
         ToByte (s + "\n")
         |> appendBytes
 
-    member this.AppendWithouLf (s:string) =
+    member this.AppendWithoutLf s =
         ToByte s
         |> appendBytes
  
     member this.Append o = 
         match box o with
-        | :? System.String as o -> appendString (o, "\n")
+        | :? System.String as o -> appendString o
         | :? System.Array as o -> appendBytes (TryCast<byte array>(o)).Value 
         | _ -> ()
 
-    member this.NewLine() = 
-        this.NewLines 1
-
-    member this.NewLines count = 
-        String.replicate count "\r"
-        |> this.AppendWithouLf
+    member this.NewLine ?count =
+        let nTimes = 
+            match count with
+            | Some i -> i
+            | _ -> 1                
+        String.replicate nTimes "\r"
+        |> this.AppendWithoutLf
     
     member this.Clear() = 
         doc.Clear()

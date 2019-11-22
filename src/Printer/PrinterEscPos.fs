@@ -1,18 +1,40 @@
 namespace Printer
+
+open System.Runtime.ConstrainedExecution
+open System.Threading.Tasks
 open Interfaces
 open CommonLibrary.Conversions
 
+type DocumentDefinition = {
+     ColsNormal: int
+     ColsCondensed: int
+     ColsExpanded: int
+    }
 
-type DocumentDefinition = { 
-    ColsNormal: int
-    ColsCondensed: int
-    ColsExpanded: int 
-    }    
-
-type PrinterEscPos(docDef:DocumentDefinition) = 
-
-    member this.Commands = (this :> ICommandEscPos)        
-
+type PrinterEscPos(docDef:DocumentDefinition) =
+    
+    let dashLine cols = String.replicate cols "-"
+    
+    let isCondensed c =
+        match c with
+        | Some true -> true
+        | _ -> false
+    
+    let getNTimes cols condensed =
+        let b = isCondensed condensed
+        let nTimes =
+            match cols with
+            | Some x when x > 0 -> x
+            | _ ->  if b then docDef.ColsCondensed - 2 else docDef.ColsNormal - 2
+        (b, nTimes)
+        
+    let prepareTable sep condensed =
+        let times = getNTimes None condensed           
+        (fst times, sep + dashLine (snd times) + sep )
+                
+    member this.Commands = (this :> ICommandEscPos)
+    
+   
     interface ICommandEscPos with
         
         member this.Bold(arg1: OnOff): byte array = 
@@ -142,4 +164,26 @@ type PrinterEscPos(docDef:DocumentDefinition) =
             ToByteArray [|29; 40; 65; 2; 0; 0; 2|] 
 
         member this.InitializePrinter: byte array =
-            ToByteArray [|27; 64|] 
+            ToByteArray [|27; 64|]
+        
+        member this.Separator(?cols:int): byte array =
+            let nTimes = match getNTimes cols (Some false) with | _, n -> n                
+            (this :> ICommandEscPos).FontAText(dashLine nTimes)
+
+        member this.SeparatorCondensed(?cols:int): byte array =
+            let nTimes = match getNTimes cols (Some true) with | _, n -> n                           
+            (this :> ICommandEscPos).CondensedText(dashLine nTimes)  
+        
+        member this.OpenCloseTable(?condensed:bool): byte array =
+            match prepareTable "+" condensed with
+            | true, s ->  
+                (this :> ICommandEscPos).CondensedText(s)
+            | _, s ->
+                (this :> ICommandEscPos).FontAText(s)                 
+            
+        member this.LineTable(?condensed:bool): byte array =
+            match prepareTable "|" condensed with
+            | true, s ->  
+                (this :> ICommandEscPos).CondensedText(s)
+            | _, s ->
+                (this :> ICommandEscPos).FontAText(s)
