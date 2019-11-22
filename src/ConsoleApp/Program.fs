@@ -8,7 +8,6 @@ let main argv =
  
     let docDef = { ColsNormal=42; ColsCondensed=56; ColsExpanded=24 }
  
-    //let prn = (PrinterEscPos(docDef) :> ICommandEscPos) 
     let prn = PrinterEscPos(docDef).Commands
      
     let doc = Document(prn)

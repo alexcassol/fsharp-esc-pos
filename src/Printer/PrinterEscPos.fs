@@ -187,11 +187,11 @@ type PrinterEscPos(docDef:DocumentDefinition) =
             | true, s ->  
                 this.Commands.CondensedText(s)
             | _, s ->
-                this.Commands.FontAText(s)                 
+            this.Commands.FontAText(s)                 
             
         member this.LineTable(?condensed:bool): byte array =
             match prepareTable "|" condensed with
             | true, s ->  
                 this.Commands.CondensedText(s)
             | _, s ->
-                this.Commands.FontAText(s)
+            this.Commands.FontAText(s)

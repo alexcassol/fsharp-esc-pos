@@ -14,15 +14,14 @@ module Printer =
                 WindowStyle=ProcessWindowStyle.Normal,
                 UseShellExecute=false)
 
-        use proc = new Process(StartInfo = startInfo)
+        let proc = new Process(StartInfo = startInfo)
         let started = 
             try
                 proc.Start()
                 
             with 
             | ex ->
-                ex.Data.Add("command", lpCmd)
-                reraise()
+                failwithf "Failed to start process %s | %s" lpCmd ex.Message
 
         if not started then
             failwithf "Failed to start process %s" lpCmd

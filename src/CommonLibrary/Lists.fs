@@ -62,7 +62,7 @@ module Lists =
 
         member x.GetAll () =            
             seq {
-                while queue.Count>0 do
+                while queue.Count > 0 do                    
                     let item = x.TryDequeue()
                     if item.IsSome then
                         yield item.Value 
