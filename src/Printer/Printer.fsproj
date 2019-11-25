@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CommonLibrary\CommonLibrary.fsproj" />
     <ProjectReference Include="..\PrinterCupsHelper\PrinterCupsHelper.fsproj" />
+    <ProjectReference Include="..\RawPrinterHelper\RawPrinterHelper.fsproj" />
   </ItemGroup>
 
 </Project>

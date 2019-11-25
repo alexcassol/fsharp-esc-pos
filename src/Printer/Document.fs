@@ -6,7 +6,7 @@ open CommonLibrary.Conversions
 type Document(?commands) =  
     
     let doc = SimpleQueue<byte array>()
-    
+    (*
     do  
         try 
             if commands.IsSome then
@@ -14,7 +14,7 @@ type Document(?commands) =
                 | :? Interfaces.ICommandEscPos as x -> doc.Enqueue x.InitializePrinter
                 | _ -> ()
         with
-        | _ -> failwith "Unknown command" 
+        | _ -> failwith "Unknown command" *)
     
     let appendBytes b = 
         doc.Enqueue b    

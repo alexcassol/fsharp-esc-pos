@@ -19,56 +19,62 @@
 //DEALINGS IN THE SOFTWARE.
 
 namespace RawPrinterHelper
+open System
 
 module private Native =
     open System.Runtime.InteropServices
 
     [<StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)>]
-    type DOCINFOA =
-        struct
-            val mutable pDocName : string
-            val mutable pOutputFile : string
-            val mutable pDataType : string 
-        end
+    [<Struct>]
+    type DOCINFOA =        
+        [<MarshalAs(UnmanagedType.LPStr)>] val mutable pDocName : string
+        [<MarshalAs(UnmanagedType.LPStr)>] val mutable pOutputFile : string
+        [<MarshalAs(UnmanagedType.LPStr)>] val mutable pDataType : string
+    
+    [<StructLayout(LayoutKind.Sequential)>]
+    [<Struct>]
+    type  PRINTER_DEFAULTS =
+        val mutable pDatatype : IntPtr
+        val mutable pDevMode : IntPtr
+        val mutable DesiredAccess : int 
 
     [<Literal>]
     let DllName = "winspool.Drv"
- 
-    [<DllImport(DllName, EntryPoint = "OpenPrinterA", SetLastError = true, CharSet = CharSet.Ansi, 
-            ExactSpelling = true, CallingConvention = CallingConvention.StdCall)>]
-    extern bool OpenPrinter([<MarshalAs(UnmanagedType.LPStr)>] string szPrinter, [<Out>] nativeint hPrinter, nativeint pd)
-
+    
+    [<DllImport(DllName, EntryPoint="OpenPrinterA", SetLastError=true, CharSet=CharSet.Ansi, ExactSpelling=true,
+                CallingConvention=CallingConvention.StdCall)>]
+    extern bool OpenPrinter([<MarshalAs(UnmanagedType.LPStr)>] string pPrinterName, IntPtr& phPrinter, PRINTER_DEFAULTS& pDefault)
+        
     [<DllImport(DllName, EntryPoint = "ClosePrinter", SetLastError = true, ExactSpelling = true,
             CallingConvention = CallingConvention.StdCall)>]
-    extern bool ClosePrinter(nativeint hPrinter)
+    extern bool ClosePrinter(IntPtr hPrinter)
 
     [<DllImport(DllName, EntryPoint = "StartDocPrinterA", SetLastError = true, CharSet = CharSet.Ansi,
             ExactSpelling = true, CallingConvention = CallingConvention.StdCall)>]
-    extern bool StartDocPrinter(nativeint hPrinter, int level,
-            [<In>] [<MarshalAs(UnmanagedType.LPStruct)>] DOCINFOA di)
+    extern bool StartDocPrinter(IntPtr hPrinter, int level, DOCINFOA& di)
 
     [<DllImport(DllName, EntryPoint = "EndDocPrinter", SetLastError = true, ExactSpelling = true,
             CallingConvention = CallingConvention.StdCall)>]
-    extern bool EndDocPrinter(nativeint hPrinter)
+    extern bool EndDocPrinter(IntPtr hPrinter)
 
     [<DllImport(DllName, EntryPoint = "StartPagePrinter", SetLastError = true, ExactSpelling = true,
             CallingConvention = CallingConvention.StdCall)>]
-    extern bool StartPagePrinter(nativeint hPrinter)
+    extern bool StartPagePrinter(IntPtr hPrinter)
 
     [<DllImport(DllName, EntryPoint = "EndPagePrinter", SetLastError = true, ExactSpelling = true,
             CallingConvention = CallingConvention.StdCall)>]
-    extern bool EndPagePrinter(nativeint hPrinter)
+    extern bool EndPagePrinter(IntPtr hPrinter)
 
     [<DllImport(DllName, EntryPoint = "WritePrinter", SetLastError = true, ExactSpelling = true,
             CallingConvention = CallingConvention.StdCall)>]
-    extern bool WritePrinter(nativeint hPrinter, nativeint pBytes, int dwCount, [<Out>] int dwWritten)
+    extern bool WritePrinter(IntPtr hPrinter, IntPtr pBytes, int dwCount, int& dwWritten)
 
     [<DllImport(DllName, EntryPoint = "FlushPrinter", SetLastError = true, CharSet = CharSet.Ansi, 
             ExactSpelling = true, CallingConvention = CallingConvention.StdCall)>]
-    extern bool FlushPrinter(nativeint hPrinter, nativeint pBuf, int32 cbBuf, [<Out>] int32 pcWritten, [<Out>] int32 cSleep)
+    extern bool FlushPrinter(IntPtr hPrinter, IntPtr pBuf, int cbBuf, int32& pcWritten, int&  cSleep)
 
     [<DllImport(DllName, EntryPoint = "SetJobA", SetLastError = true)>]
-    extern int SetJob(nativeint hPrinter, uint32 JobId, uint32 Level, nativeint pJob, uint32 Command_Renamed)
+    extern int SetJob(nativeint hPrinter, uint32 JobId, uint32 Level, IntPtr pJob, uint32 Command_Renamed)
  
     
 

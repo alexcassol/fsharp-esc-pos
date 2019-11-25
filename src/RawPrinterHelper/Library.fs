@@ -26,20 +26,23 @@ module Printer =
     open System.Runtime.InteropServices
     open Native
     open CommonLibrary.Utils
+    open System.ComponentModel
 
-    let getError =
-        Marshal.GetLastWin32Error()  
+    let getErrorMessage =
+        let errorMessage = Win32Exception(Marshal.GetLastWin32Error())
+        errorMessage.Message
 
     let private sendToPrinter szPrinterName pBytes dwCount =
         let mutable dwWritten = 0
-        let mutable hPrinter = new nativeint(0)
+        let mutable hPrinter = new IntPtr(0)
         let mutable di = DOCINFOA(pDocName = randomStr 8, pDataType = "RAW", pOutputFile = null)
+        let mutable pd = PRINTER_DEFAULTS(pDatatype=IntPtr.Zero, pDevMode=IntPtr.Zero, DesiredAccess=0)
         let mutable bSuccess = false
 
-        if OpenPrinter(szPrinterName, hPrinter, IntPtr.Zero) then
-            if StartDocPrinter(hPrinter, 1, di) then
+        if OpenPrinter(szPrinterName, &hPrinter, &pd) then
+            if StartDocPrinter(hPrinter, 1, &di) then
                 if StartPagePrinter(hPrinter) then
-                    if WritePrinter(hPrinter, pBytes, dwCount, dwWritten) then
+                    if WritePrinter(hPrinter, pBytes, dwCount, &dwWritten) then
                         bSuccess <- true
                     EndPagePrinter(hPrinter) |> ignore                        
                 EndDocPrinter(hPrinter) |> ignore 
@@ -47,12 +50,14 @@ module Printer =
 
         match bSuccess with
         | true -> 0
-        | _ ->  getError
+        | _ -> failwith getErrorMessage
  
     
     let SendBytesToPrinter (szPrinterName: string, data: byte[]) =
         let len = Array.length data
-        let pUnmanagedBytes = Marshal.AllocCoTaskMem(Array.length data)
+        let mutable pUnmanagedBytes = new IntPtr(0)
+        
+        pUnmanagedBytes <- Marshal.AllocCoTaskMem len
         Marshal.Copy(data, 0, pUnmanagedBytes, len)   
 
         let retVal = sendToPrinter szPrinterName pUnmanagedBytes len

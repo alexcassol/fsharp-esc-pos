@@ -15,7 +15,7 @@ let main argv =
     
     doc.Append "teste"
     doc.Append "taste2" 
-    
+    (*
     doc.Append (prn.ItalicText "teste")
     doc.Append (prn.Italic On)
     doc.Append "teste3"
@@ -32,7 +32,7 @@ let main argv =
     
 
     doc.Append (prn.PaperCut Full)
- 
+ *)
     let p = Printer.Printer("PDF")
     
     p.Print doc
