@@ -19,26 +19,49 @@
 //DEALINGS IN THE SOFTWARE.
 
 namespace RawPrinterHelper
+open CommonLibrary
+open System
 
 module Printer =
     open System
     open System.IO
     open System.Runtime.InteropServices
     open Native
-    open CommonLibrary.Utils
     open System.ComponentModel
 
-    let getErrorMessage =
+    let private getErrorMessage =
         let errorMessage = Win32Exception(Marshal.GetLastWin32Error())
         errorMessage.Message
+        
+    let private defineDocDataType =        
+        match CommonLibrary.SysOp.getWindowsVersion with
+        | x, y when x >= 6 && y >= 2 -> "XPS_PASS"
+        | x, _ when x > 6 -> "RAW"
+        | _, _ -> "RAW"
 
+    let private getPrinterDriverInfo hPrinter =
+        let mutable driverInfo = new IntPtr(0)
+        let mutable buf_len = 0;
+
+        let a = GetPrinterDriver(hPrinter, "", 8, driverInfo, 0, &buf_len);
+
+        driverInfo <- Marshal.AllocHGlobal(buf_len);
+
+        let _ = GetPrinterDriver(hPrinter, "", 8, driverInfo, buf_len, &buf_len);
+        
+        let info = Marshal.PtrToStructure(driverInfo, typeof<DRIVER_INFO_8>)
+        
+        Marshal.FreeHGlobal(driverInfo)
+        Conversions.TryCast<DRIVER_INFO_8>(info)
+
+    
     let private sendToPrinter szPrinterName pBytes dwCount =
-        let mutable dwWritten = 0
+        let mutable dwWritten:int32 = 0
         let mutable hPrinter = new IntPtr(0)
-        let mutable di = DOCINFOA(pDocName = randomStr 8, pDataType = "RAW", pOutputFile = null)
+        let mutable di = DOCINFOA(pDocName = CommonLibrary.Utils.randomStr 8, pDataType = defineDocDataType, pOutputFile = null)
         let mutable pd = PRINTER_DEFAULTS(pDatatype=IntPtr.Zero, pDevMode=IntPtr.Zero, DesiredAccess=0)
         let mutable bSuccess = false
-
+        
         if OpenPrinter(szPrinterName, &hPrinter, &pd) then
             if StartDocPrinter(hPrinter, 1, &di) then
                 if StartPagePrinter(hPrinter) then
@@ -67,7 +90,7 @@ module Printer =
 
     let SendStringToPrinter (szPrinterName: string, szString: string) =
         // How many characters are in the string?
-        let dwCount = szString.Length
+        let dwCount = (szString.Length + 1) * Marshal.SystemMaxDBCSCharSize;
         
         // Assume that the printer is expecting ANSI text, and then convert
         // the string to ANSI text.
@@ -75,6 +98,9 @@ module Printer =
 
         // Send the converted ANSI string to the printer.
         let retVal = sendToPrinter szPrinterName pBytes dwCount
+        
+        Marshal.FreeCoTaskMem(pBytes)
+        
         retVal
     
     let SendAsciiToPrinter (szPrinterName: string, szString: string) =

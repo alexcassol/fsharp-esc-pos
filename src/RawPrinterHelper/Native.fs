@@ -27,16 +27,51 @@ module private Native =
     [<StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)>]
     [<Struct>]
     type DOCINFOA =        
-        [<MarshalAs(UnmanagedType.LPStr)>] val mutable pDocName : string
-        [<MarshalAs(UnmanagedType.LPStr)>] val mutable pOutputFile : string
-        [<MarshalAs(UnmanagedType.LPStr)>] val mutable pDataType : string
+        val mutable pDocName : string
+        val mutable pOutputFile : string
+        val mutable pDataType : string
     
     [<StructLayout(LayoutKind.Sequential)>]
     [<Struct>]
     type  PRINTER_DEFAULTS =
         val mutable pDatatype : IntPtr
         val mutable pDevMode : IntPtr
-        val mutable DesiredAccess : int 
+        val mutable DesiredAccess : int
+
+    [<StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)>]
+    [<Struct>]
+    type FILETIME =
+        val mutable dwHighDateTime : int
+        val mutable dwLowDateTime : int
+            
+    [<StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)>]
+    [<Struct>]
+    type DRIVER_INFO_8 =
+        val mutable cVersion : int
+        val mutable pName : string
+        val mutable pEnvironment : string
+        val mutable pDriverPath : string
+        val mutable pDataFile : string
+        val mutable pConfigFile : string
+        val mutable pHelpFile : string
+        val mutable pDependentFiles : string
+        val mutable pMonitorName : string
+        val mutable pDefaultDataType : string
+        val mutable pszzPreviousNames : string
+        val mutable ftDriverDate : FILETIME
+        val mutable dwlDriverVersion : int64
+        val mutable pszMfgName : string
+        val mutable pszOEMUrl : string
+        val mutable pszHardwareID : string
+        val mutable pszProvider : string
+        val mutable pszPrintProcessor : string
+        val mutable pszVendorSetup : string
+        val mutable pszzColorProfiles : string
+        val mutable pszInfPath : string
+        val mutable dwPrinterDriverAttributes : int
+        val mutable pszzCoreDriverDependencies : string
+        val mutable ftMinInboxDriverVerDate : FILETIME
+        val mutable dwlMinInboxDriverVerVersion : int64
 
     [<Literal>]
     let DllName = "winspool.Drv"
@@ -67,7 +102,7 @@ module private Native =
 
     [<DllImport(DllName, EntryPoint = "WritePrinter", SetLastError = true, ExactSpelling = true,
             CallingConvention = CallingConvention.StdCall)>]
-    extern bool WritePrinter(IntPtr hPrinter, IntPtr pBytes, int dwCount, int& dwWritten)
+    extern bool WritePrinter(IntPtr hPrinter, IntPtr pBytes, int32 dwCount, int32& dwWritten)
 
     [<DllImport(DllName, EntryPoint = "FlushPrinter", SetLastError = true, CharSet = CharSet.Ansi, 
             ExactSpelling = true, CallingConvention = CallingConvention.StdCall)>]
@@ -75,9 +110,10 @@ module private Native =
 
     [<DllImport(DllName, EntryPoint = "SetJobA", SetLastError = true)>]
     extern int SetJob(nativeint hPrinter, uint32 JobId, uint32 Level, IntPtr pJob, uint32 Command_Renamed)
- 
     
-
+    [<DllImport(DllName, EntryPoint = "GetPrinterDriverW", CallingConvention = CallingConvention.StdCall,
+                CharSet = CharSet.Unicode, SetLastError = true, ExactSpelling = true)>]
+    extern bool GetPrinterDriver(IntPtr hPrinter, string pEnvironment, int Level, IntPtr pPrinter, int cbBuf, int& dwNeeded);
 
 
 

@@ -34,3 +34,9 @@ module SysOp =
         | 4 | 128 -> Linux
         | 6       -> OSX
         | _       -> Windows
+        
+        
+    let getWindowsVersion =
+        let vr =
+            Environment.OSVersion.Version
+        (vr.Major, vr.Minor)
